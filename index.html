@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pequenos Sentinelas — Ranking do Clube</title>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="stylesheet.css" />
+
+</head>
+<body>
+    <header>
+  <div class="badge">03ª Região · Alpha | AVT</div>
+  <h1>Pequenos Sentinelas</h1>
+  <p class="subtitle">Painel de Gerenciamento de Atividades & Ranking</p>
+</header>
+ 
+<!-- PROGRESS -->
+<div class="progress-section" style="max-width:820px;margin:2rem auto 0;padding:1.8rem 2rem">
+  <div class="progress-header">
+    <div class="progress-label">Pontuação Total</div>
+    <div class="progress-score" id="score-display">0 <span>/ 15.000 pts</span></div>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+  <div class="progress-milestones">
+    <span class="milestone">0</span>
+    <span class="milestone">3.750</span>
+    <span class="milestone">7.500</span>
+    <span class="milestone">11.250</span>
+    <span class="milestone">15.000</span>
+  </div>
+  <div class="classification">
+    <div class="class-chip">📊 Completude: <strong id="pct-label">0%</strong></div>
+    <div class="class-chip">✅ Concluídas: <strong id="done-label">0</strong></div>
+  </div>
+</div>
+ 
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="dot" style="background:var(--green)"></div> Concluída</div>
+  <div class="legend-item"><div class="dot" style="background:var(--red)"></div> Negada</div>
+  <div class="legend-item"><div class="dot" style="background:var(--yellow)"></div> Em andamento</div>
+  <div class="legend-item"><div class="dot" style="background:var(--gray)"></div> Sem progresso</div>
+</div>
+ 
+<!-- TABLE -->
+<div class="table-section" id="table-section"></div>
+ 
+<!-- STATUS POPUP -->
+<div class="status-popup" id="status-popup">
+  <div class="status-opt" data-s="none">  <div class="dot" style="background:var(--gray)"></div>  Sem progresso</div>
+  <div class="status-opt" data-s="done">  <div class="dot" style="background:var(--green)"></div> Concluída</div>
+  <div class="status-opt" data-s="denied"><div class="dot" style="background:var(--red)"></div>   Negada</div>
+  <div class="status-opt" data-s="wip">   <div class="dot" style="background:var(--yellow)"></div>Em andamento</div>
+</div>
+ 
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close">✕</button>
+    <div class="modal-area" id="modal-area"></div>
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-info">
+      <div class="modal-row">
+        <label>Pontos possíveis</label>
+        <strong id="modal-total"></strong>
+      </div>
+      <div class="modal-row">
+        <label>Pontos conquistados</label>
+        <strong id="modal-earned"></strong>
+      </div>
+      <div class="modal-row">
+        <label>Status</label>
+        <strong id="modal-status"></strong>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- TOAST -->
+<div class="toast" id="toast">Salvo!</div>
+<script src="script.js"></script>
+
+</body>
+</html>
