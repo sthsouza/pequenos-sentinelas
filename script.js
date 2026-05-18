@@ -69,15 +69,62 @@ const STATUS_COLORS = {
   none:"var(--gray)", done:"var(--green)", denied:"var(--red)", wip:"var(--yellow)"
 };
  
-// Load / init state
-let state = JSON.parse(localStorage.getItem('ps_state') || '{}');
-RAW_TASKS.forEach((t,i) => {
-  if (!state[i]) state[i] = {status:'none', earned:0};
+// ─── FIREBASE CONFIG ───────────────────────────────────────────────────────
+// 1. Acesse https://console.firebase.google.com
+// 2. Crie um projeto → clique em "Adicionar app" → ícone Web (</>)
+// 3. No menu lateral: Build → Realtime Database → Criar banco → modo teste
+// 4. Volte em Configurações do projeto e copie o firebaseConfig
+// 5. Cole os valores abaixo substituindo cada "COLE_AQUI":
+const firebaseConfig = {
+  apiKey:            "AIzaSyCpx_vEdag_hEgW4t1yPJcy7qBQ3uLuJpY",
+  authDomain:        "pequenos-sentinelas.firebaseapp.com",
+  databaseURL:       "https://pequenos-sentinelas-default-rtdb.firebaseio.com",
+  projectId:         "pequenos-sentinelas",
+  storageBucket:     "pequenos-sentinelas.firebasestorage.app",
+  messagingSenderId: "851954424134",
+  appId:             "1:851954424134:web:83029e402ba206aa6eed47"
+};
+// ───────────────────────────────────────────────────────────────────────────
+ 
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const stateRef = db.ref('ps_state');
+ 
+let state = {};
+let dbReady = false;
+ 
+function initState() {
+  RAW_TASKS.forEach((t,i) => {
+    if (!state[i]) state[i] = {status:'none', earned:0};
+  });
+}
+ 
+// Escuta mudanças em tempo real → atualiza em todos os dispositivos automaticamente
+stateRef.on('value', snapshot => {
+  const data = snapshot.val();
+  if (data) state = data;
+  initState();
+  if (!dbReady) {
+    dbReady = true;
+    build();
+    updateProgress();
+    applyAuthState();
+    document.getElementById('loading-overlay').style.display = 'none';
+  } else {
+    RAW_TASKS.forEach((_,i) => updateRow(i));
+    updateProgress();
+    applyAuthState();
+  }
 });
  
-function save() {
-  localStorage.setItem('ps_state', JSON.stringify(state));
-  showToast('Salvo ✓');
+async function save() {
+  try {
+    await stateRef.set(state);
+    showToast('Salvo ✓');
+  } catch(e) {
+    showToast('Erro ao salvar ✗');
+    console.error(e);
+  }
 }
  
 function showToast(msg) {
@@ -189,6 +236,7 @@ let activePopupIdx = null;
 const popup = document.getElementById('status-popup');
  
 function openPopup(e, i) {
+  if (!isAdmin) return;
   e.stopPropagation();
   activePopupIdx = i;
   const btn = document.getElementById('dot-' + i);
@@ -240,5 +288,75 @@ document.getElementById('modal-overlay').addEventListener('click', e => {
     document.getElementById('modal-overlay').classList.remove('open');
 });
  
-build();
-updateProgress();
+// AUTH
+const ADMIN_USER = 'secretaria';
+const ADMIN_PASS = 'aventureiros';
+let isAdmin = sessionStorage.getItem('ps_admin') === '1';
+ 
+function applyAuthState() {
+  const btn = document.getElementById('login-btn');
+  if (isAdmin) {
+    btn.textContent = '🔓';
+    btn.classList.add('logged-in');
+    btn.title = 'Logada como Secretaria';
+  } else {
+    btn.textContent = '🔒';
+    btn.classList.remove('logged-in');
+    btn.title = 'Área restrita';
+  }
+  // Update all dots to readonly if not admin
+  document.querySelectorAll('.status-dot-btn').forEach(d => {
+    if (isAdmin) d.classList.remove('readonly');
+    else d.classList.add('readonly');
+  });
+}
+ 
+function openLoginModal() {
+  const overlay = document.getElementById('login-modal-overlay');
+  document.getElementById('login-form-wrap').style.display = isAdmin ? 'none' : 'block';
+  document.getElementById('logout-wrap').style.display = isAdmin ? 'block' : 'none';
+  document.getElementById('login-error').textContent = '';
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  overlay.classList.add('open');
+}
+ 
+function closeLoginModal() {
+  document.getElementById('login-modal-overlay').classList.remove('open');
+}
+ 
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    isAdmin = true;
+    sessionStorage.setItem('ps_admin', '1');
+    applyAuthState();
+    closeLoginModal();
+    showToast('Bem-vinda, Secretaria! ✓');
+  } else {
+    document.getElementById('login-error').textContent = 'Usuário ou senha incorretos.';
+  }
+}
+ 
+function doLogout() {
+  isAdmin = false;
+  sessionStorage.removeItem('ps_admin');
+  applyAuthState();
+  closeLoginModal();
+  showToast('Sessão encerrada.');
+}
+ 
+// Enter key on login fields
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-modal-overlay').classList.contains('open') && !isAdmin) {
+    doLogin();
+  }
+});
+ 
+// Close login modal on overlay click
+document.getElementById('login-modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('login-modal-overlay')) closeLoginModal();
+});
+ 
+// build() e updateProgress() são chamados pelo listener do Firebase acima
