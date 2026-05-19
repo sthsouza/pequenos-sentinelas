@@ -1,182 +1,87 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pequenos Sentinelas — Ranking do Clube</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;900&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pequenos Sentinelas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="stylesheet.css">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
-<!-- LOADING -->
-<div id="loading-overlay">
-  <div class="spinner"></div>
-  <div class="loading-text">Conectando ao banco de dados...</div>
-</div>
-
+<!-- HEADER -->
 <header>
-  <div class="badge">03ª Região · Alpha | AVT</div>
-  <h1>Pequenos Sentinelas</h1>
-  <p class="subtitle">Painel de Gerenciamento de Atividades & Ranking</p>
+  <div class="header-inner">
+    <div class="badge">Clube de Aventureiros</div>
+    <h1 class="club-name">Pequenos<br><span>Sentinelas</span></h1>
+  </div>
 </header>
 
-<!-- PROGRESS -->
-<div class="progress-section">
-  <div class="progress-header">
-    <div class="progress-label">Pontuação Total</div>
-    <div class="progress-score" id="score-display">
-      0 <span>/ 15.000 pts</span>
+<!-- FOTO DO CLUBE -->
+<section class="photo-section">
+  <div class="photo-frame">
+    <div class="photo-border"></div>
+    <div class="photo-area">
+      <img src="pngs/aventureiros-capa.jpeg" alt="Foto do clube Pequenos Sentinelas">
     </div>
   </div>
+  <p class="photo-caption">Nossa turma</p>
+</section>
 
-  <div class="progress-track">
-    <div class="progress-fill" id="progress-fill"></div>
+<!-- MENU -->
+<section class="menu-section">
+  <p class="menu-title">✦ Menu principal ✦</p>
+  <div class="menu-grid">
+
+    <a href="https://drive.google.com/drive/folders/1yzpMvWWHsAw_iGgld-FaRs7THsVjfOt4?usp=sharing"
+   target="_blank"
+   class="menu-btn btn-fotos"
+   onclick="handleBtn(this, 'Fotos')">
+
+  <span class="btn-emoji">📷</span>
+  <span class="btn-label">Fotos</span>
+  <span class="btn-sub">Galeria do clube</span>
+
+</a>
+
+<a href="https://docs.google.com/spreadsheets/d/1hh08dzj9LweVZq24YKBhHjDeOfzZ2F12zhqFvXjIp3Q/edit?usp=sharing"
+   target="_blank"
+   class="menu-btn btn-ranking"
+   onclick="handleBtn(this, 'Ranking')">
+
+  <span class="btn-emoji">🏆</span>
+  <span class="btn-label">Ranking</span>
+  <span class="btn-sub">Pontuação geral</span>
+
+</a>
+
+<a href="LINK_DA_AGENDA"
+   target="_blank"
+   class="menu-btn btn-agenda"
+   onclick="handleBtn(this, 'Agenda')">
+
+  <span class="btn-emoji">📅</span>
+  <span class="btn-label">Agenda</span>
+  <span class="btn-sub">Próximos eventos</span>
+
+</a>
+
+<a href="LINK_DA_CHAMADA"
+   target="_blank"
+   class="menu-btn btn-chamada"
+   onclick="handleBtn(this, 'Chamada')">
+
+  <span class="btn-emoji">✅</span>
+  <span class="btn-label">Chamada</span>
+  <span class="btn-sub">Presença do dia</span>
+
+</a>
   </div>
+</section>
 
-  <div class="progress-milestones">
-    <span class="milestone">0</span>
-    <span class="milestone">3.750</span>
-    <span class="milestone">7.500</span>
-    <span class="milestone">11.250</span>
-    <span class="milestone">15.000</span>
-  </div>
-</div>
-
-<!-- LEGEND -->
-<div class="legend">
-  <div class="legend-item">
-    <div class="dot" style="background:var(--green)"></div>
-    Concluída
-  </div>
-
-  <div class="legend-item">
-    <div class="dot" style="background:var(--red)"></div>
-    Negada
-  </div>
-
-  <div class="legend-item">
-    <div class="dot" style="background:var(--yellow)"></div>
-    Em andamento
-  </div>
-
-  <div class="legend-item">
-    <div class="dot" style="background:var(--gray)"></div>
-    Sem progresso
-  </div>
-</div>
-
-<!-- TABLE -->
-<div class="table-section" id="table-section"></div>
-
-<!-- STATUS POPUP -->
-<div class="status-popup" id="status-popup">
-  <div class="status-opt" data-s="none">
-    <div class="dot" style="background:var(--gray)"></div>
-    Sem progresso
-  </div>
-
-  <div class="status-opt" data-s="done">
-    <div class="dot" style="background:var(--green)"></div>
-    Concluída
-  </div>
-
-  <div class="status-opt" data-s="denied">
-    <div class="dot" style="background:var(--red)"></div>
-    Negada
-  </div>
-
-  <div class="status-opt" data-s="wip">
-    <div class="dot" style="background:var(--yellow)"></div>
-    Em andamento
-  </div>
-</div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal-box">
-
-    <button class="modal-close" id="modal-close">✕</button>
-
-    <div class="modal-area" id="modal-area"></div>
-
-    <div class="modal-title" id="modal-title"></div>
-
-    <div class="modal-info">
-
-      <div class="modal-row">
-        <label>Pontos possíveis</label>
-        <strong id="modal-total"></strong>
-      </div>
-
-      <div class="modal-row">
-        <label>Pontos conquistados</label>
-        <strong id="modal-earned"></strong>
-      </div>
-
-      <div class="modal-row">
-        <label>Status</label>
-        <strong id="modal-status"></strong>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast">Salvo!</div>
-
-<!-- LOGIN BUTTON -->
-<button id="login-btn" title="Área restrita" onclick="openLoginModal()">
-  🔒
-</button>
-
-<!-- LOGIN MODAL -->
-<div class="login-modal-overlay" id="login-modal-overlay">
-  <div class="login-box" id="login-box">
-
-    <button class="login-close" onclick="closeLoginModal()">✕</button>
-
-    <div id="login-form-wrap">
-      <h2>Área da Secretaria</h2>
-
-      <p>Faça login para editar os dados do ranking.</p>
-
-      <div class="login-field">
-        <label>Usuário</label>
-        <input type="text" id="login-user" autocomplete="off">
-      </div>
-
-      <div class="login-field">
-        <label>Senha</label>
-        <input type="password" id="login-pass">
-      </div>
-
-      <div class="login-error" id="login-error"></div>
-
-      <button class="login-submit" onclick="doLogin()">
-        Entrar
-      </button>
-    </div>
-
-    <div id="logout-wrap" style="display:none">
-      <h2>Secretaria</h2>
-
-      <p>Você está logada e pode editar o ranking.</p>
-
-      <button class="logout-btn" onclick="doLogout()">
-        Sair da conta
-      </button>
-    </div>
-
-  </div>
-</div>
+<footer>
+  Feito com 💙 para os <span>Pequenos Sentinelas</span>
+</footer>
 
 <script src="script.js"></script>
 </body>
